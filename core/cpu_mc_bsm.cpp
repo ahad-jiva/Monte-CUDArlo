@@ -48,7 +48,9 @@ void monte_carlo_eu_call(double S0, double K, double T, double r, double sigma, 
   std::cout << "Saved " << n << " paths with " << steps << " steps to 'paths.csv'" << std::endl;
 
   for (int i = 0; i < n; i++){
-    payoff_sum += paths[i][steps];
+    double S_T = paths[i][steps];
+    double payoff = std::max(S_T - K, 0.0);
+    payoff_sum += payoff;
   }
 
   // averaging and discounting
@@ -62,5 +64,5 @@ void monte_carlo_eu_call(double S0, double K, double T, double r, double sigma, 
 }
 
 int main() {
-    monte_carlo_eu_call(100, 150, 10, 0.05, 0.1, 5000, 200);
+    monte_carlo_eu_call(100, 150, 10, 0.05, 0.1, 2000, 100);
 }

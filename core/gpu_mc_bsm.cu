@@ -7,7 +7,7 @@
 __global__ void monte_carlo_eu_call(double *payoffs, double S0, double K, double T, double r, double sigma, unsigned int seed, int n) {
     // All parameters will be the same for each thread
     // Only the random normal sample will be per-thread
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    int idx = threadIdx.x;
     if (idx >= n) return;
 
     curandState state;
@@ -34,12 +34,8 @@ int main(){
     double *payoffs;
     cudaMalloc(&payoffs, n_paths * sizeof(double));
 
-    // kernel config
-    int block_size = 256;
-    int num_blocks = (n_paths + block_size - 1) / block_size;
-
     auto start_time = std::chrono::high_resolution_clock::now();
-    monte_carlo_eu_call<<<num_blocks, block_size>>>(payoffs, S0, K, T, r, sigma, time(NULL), n_paths);
+    monte_carlo_eu_call<<<1, 256>>>(payoffs, S0, K, T, r, sigma, time(NULL), n_paths);
     cudaDeviceSynchronize();
     auto end_time = std::chrono::high_resolution_clock::now();
 
